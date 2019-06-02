@@ -88,8 +88,8 @@ pipeline {
                     sh 'ls -la'
 
                     //Commented out for a reason.
-
-                    sh "ssh -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} 'date'"
+                    sh "sftp -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} <<< 'put target.tzr.gz'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} 'tar xzf target.tzr.gz ~/node-app/'"
 
 
                 }
