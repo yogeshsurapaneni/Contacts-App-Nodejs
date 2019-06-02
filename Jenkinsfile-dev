@@ -60,7 +60,7 @@ pipeline {
 
 
 
-                    sourcefile="$WORKSPACE/*"
+                    sourcefile="."
                     targetfile="target.tzr.gz"
 
                     sh "tar -czvf $targetfile $sourcefile"
@@ -89,9 +89,9 @@ pipeline {
 
                     //Commented out for a reason.
                     sh "sftp -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} <<< 'put target.tzr.gz'"
-                    sh "ssh -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} 'tar xzf target.tzr.gz'"
+                    sh "ssh -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} 'tar xzf target.tzr.gz && rm -rf target.tzr.gz'"
 
-                    sh "rm -rf $WORKSPACE/target.tzr.gz"
+                    sh "rm -rf target.tzr.gz"
                 }
             }
             post{
