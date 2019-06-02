@@ -1,0 +1,102 @@
+pipeline {
+    agent { label 'linux-1' }
+    environment {
+        //Server details
+        dev_server = '10.142.0.5'
+        dev_branch = 'master'
+
+        //Password for SSH Auth..
+        pass = credentials('key')
+
+        //Color Variables for Jenkins Logs.
+        BGreen='\033[1;32m'
+        RED='\033[0;31m'
+        NC='\033[0m'
+        CYAN='\\e[36m'
+        BLUE= '\\e[34m'
+        BIGreen='\033[1;92m'
+        BIRed='\033[1;91m'
+
+    }
+    options {
+        //Jenkins Build Options.
+        timestamps()
+        ansiColor('xterm')
+    }
+    stages {
+        stage('Checkout') {
+
+            //checkout of Bitbucket Repo Starts here.
+            steps {
+
+                //git poll:true, credentialsId:'github', branch:"${dev_branch}", url:'https://github.com/DevOps-Aspirants/contacts-node-app.git'
+                checkout scm
+                script{
+
+                    //Checking who commited this build.
+                    committerEmail = sh (
+                            script: 'git --no-pager show -s --format=\'%ae\'',
+                            returnStdout: true
+                    ).trim()
+
+                    committerName = sh (
+                            script: 'git --no-pager show -s --format=\'%aN\'',
+                            returnStdout: true
+                    ).trim()
+
+                    echo "*****************${BIGreen} The Build is triggered by ${committerName}'s commit ### ${committerEmail} ${NC}********************* "
+
+                }
+            }
+        }
+        stage('Build') {
+            steps {
+                script {
+
+                    task = 'BUILD'
+                    sh 'echo "starting node build"'
+                    sh 'npm install express --save'
+
+                }
+                //stash name: 'artifact', includes: 'target/*'
+            }
+            post{
+                success{
+                    echo "Build Successful"
+
+                }
+                failure{
+                    echo "Build Failed"
+
+                }
+            }
+        }
+
+//        stage('Deploy on Dev') {
+//            steps{
+//                script{
+//                    task = 'Deployment to Dev'
+//                    echo "Upload and replace artifact on the Dev_server @ ${dev_server}"
+//                    sh 'pwd'
+//                    sh 'ls -la'
+//
+//                    //Commented out for a reason.
+//
+//                    sh "ssh -o StrictHostKeyChecking=no -i ${pass} yogesh@${dev_server} 'hostname'"
+//
+//
+//                }
+//            }
+//            post{
+//                success{
+//                    echo "Deployment Successful"
+//
+//                }
+//                failure{
+//                    echo "Deployment Failed"
+//
+//                }
+//            }
+//        }
+    }
+}
